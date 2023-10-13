@@ -31,7 +31,7 @@ def generate_calibration_grid():
     height_max = VIRT_DISPLAY_HEIGHT
     step = 60
     background = Image.new('RGBA', (width_max, height_max), (0, 0, 0, 255))
-    font = ImageFont.truetype('./Ubuntu-Light.ttf', 20)
+    font = ImageFont.truetype('./misc/Ubuntu-Light.ttf', 20)
     
     data = ""
     i = 0

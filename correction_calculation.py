@@ -15,7 +15,7 @@ import csv
 
 def detect_cross(image, debug=False):
     img2 = image.copy()
-    template = cv2.imread('./template.png', cv2.IMREAD_GRAYSCALE)
+    template = cv2.imread('./misc/template.png', cv2.IMREAD_GRAYSCALE)
     assert template is not None, "file could not be read, check with os.path.exists()"
     w, h = template.shape[::-1]
     # All the 6 methods for comparison in a list
