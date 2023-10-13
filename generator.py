@@ -7,7 +7,13 @@ Created on Fri Sep  8 11:42:02 2023
 import os
 import zipfile
 import cv2
+import yaml
+import argparse
 
+
+with open("config.cfg") as f:
+    cfg = yaml.load(f, Loader=yaml.FullLoader)
+    
 PIXEL_RATIO = 24/19
 REAL_DISPLAY_WIDTH = 11520
 REAL_DISPLAY_HEIGHT = 5120
@@ -55,7 +61,7 @@ def generate_calibration_grid():
     background.save('1.png')
     
 
-def make_cross_markers():
+def make_cross_markers(use_corrections=False):
     width_max = VIRT_DISPLAY_WIDTH
     height_max = VIRT_DISPLAY_HEIGHT
     background = Image.new('RGBA', (width_max, height_max), (0, 0, 0, 255))
@@ -68,27 +74,46 @@ def make_cross_markers():
         draw.line((x + size, y, x - size, y), fill='white', width=2) 
         draw.line((x, y + size, x, y - size), fill='white', width=2) 
     
-    #corrections should be minused from these values
+    # Corrections should be minused from these values
     # top left corner, frame_0
-    x, y = 10955 + 19, 6050 + 4
-    draw_cross(x, y)
     
-    # bottom left corner, frame_2
-    x, y = 10930 + 14,1870 - 17  
-    draw_cross(x, y);
+    frames = ["frame_0", "frame_1", "frame_2", "frame_3"]
+    if use_corrections:
+        corrections = read_corrections()
+        print(">>>> Correction read: ", corrections)
+    for frame in frames:
+        if use_corrections:
+            draw_cross(cfg[frame]["x"] - corrections[frame + ".jpg"][0], cfg[frame]["y"] - corrections[frame + ".jpg"][1])
+        else:
+            draw_cross(cfg[frame]["x"], cfg[frame]["y"])
     
-    # Bottom right corner, frame 3
-    x, y = 7680 + 1,1880 - 8
-    draw_cross(x, y);
-    
-    # Top right corner, frame 1
-    x, y = 7680 + 33, 6070 + 5
-    draw_cross(x, y);
 
     background = background.resize((REAL_DISPLAY_WIDTH, REAL_DISPLAY_HEIGHT), resample=Image.LANCZOS)
     background.save('1.png')
 
 
-make_cross_markers()
-#generate_calibration_grid()
-generate_chitubox_zip(None)
+def read_corrections():
+    import csv
+    
+    corrections = dict()
+    with open('corrections.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for line in reader:
+            corrections[line['frame'] ]= (int(line['correction_x']), int(line['correction_y']))
+    
+    return corrections
+
+    
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate files running on LUCID lithomachine')
+    parser.add_argument("--correct", action="store_true", help='Read and use registration point corrections from file')
+    parser.add_argument("--grid", action="store_true", help='Generate rought numeric grid for initial positioning')
+    args = parser.parse_args()
+
+    make_cross_markers(args.correct)
+
+    if args.grid:
+        generate_calibration_grid()
+        
+    generate_chitubox_zip(None)
+

@@ -44,13 +44,13 @@ def detect_cross(image, debug=False):
     return top_left[0] + w // 2, top_left[1] + h // 2
 
 
-def detect_cirle(image, min_radius=80, max_radius=160, debug=False):
+def detect_cirle(image, min_radius=140, max_radius=160, debug=False):
     
     image_circles = image.copy()
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     image_circles = clahe.apply(image_circles)
     #ret,image_circles = cv2.threshold(img_source,127,255,cv2.THRESH_BINARY)
-    image_circles = cv2.GaussianBlur(image_circles, (35, 35), cv2.BORDER_DEFAULT)
+    image_circles = cv2.GaussianBlur(image_circles, (25, 25), cv2.BORDER_DEFAULT)
     
     # Apply Hough transform on the blurred image.
     detected_circles = cv2.HoughCircles(

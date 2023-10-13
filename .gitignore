@@ -161,3 +161,6 @@ cython_debug/
 #
 *.csv
 camera_frames/
+1.png
+*.zip
+*.goo
