@@ -9,7 +9,7 @@ import zipfile
 import cv2
 import yaml
 import argparse
-
+import json
 
 with open("config.cfg") as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
@@ -70,7 +70,10 @@ def make_cross_markers(use_corrections=False):
     # To move aruco right - increase x
     
     draw = ImageDraw.Draw(background)
+    points = []
     def draw_cross(x, y, size=25):
+        print("Cross x:", x, "Cross y: ", y)
+        points.append((x, y))
         draw.line((x + size, y, x - size, y), fill='white', width=2) 
         draw.line((x, y + size, x, y - size), fill='white', width=2) 
     
@@ -86,7 +89,9 @@ def make_cross_markers(use_corrections=False):
             draw_cross(cfg[frame]["x"] - corrections[frame + ".jpg"][0], cfg[frame]["y"] - corrections[frame + ".jpg"][1])
         else:
             draw_cross(cfg[frame]["x"], cfg[frame]["y"])
-    
+    points_json_object = json.dumps(points, indent=4)
+    with open("points.json", "w") as outfile:
+        outfile.write(points_json_object)
 
     background = background.resize((REAL_DISPLAY_WIDTH, REAL_DISPLAY_HEIGHT), resample=Image.LANCZOS)
     background.save('1.png')

@@ -36,14 +36,20 @@ while True:
     
 
     cv2.imshow("Result", combined_frames)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1)
+    if  key & 0xFF == ord('q'):
         cv2.imwrite(CAMERA_FRAMES_DIR + 'frame_0.jpg', frames[0]) 
         cv2.imwrite(CAMERA_FRAMES_DIR + 'frame_1.jpg', frames[1]) 
         cv2.imwrite(CAMERA_FRAMES_DIR + 'frame_2.jpg', frames[2]) 
         cv2.imwrite(CAMERA_FRAMES_DIR + 'frame_3.jpg', frames[3]) 
+        correction_calculation.run()
+        break
+        
+    elif key & 0xFF == ord('d'):
+        print("Exit without correction")
         break
 
 cv2.destroyAllWindows()
 
-correction_calculation.run()
+
 
